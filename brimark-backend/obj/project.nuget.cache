@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "VsQ0LT467bJIBhvo4vqxxal7sX5+AtgxLHvrmBeHwnjolxjvEm080tMZH388cQln19Nl5KZ4/0vC8Dt7gmbCgA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\byron\\Documents\\dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\byron\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
+    "C:\\Users\\byron\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\byron\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
+    "C:\\Users\\byron\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\5.6.3\\swashbuckle.aspnetcore.swagger.5.6.3.nupkg.sha512",
+    "C:\\Users\\byron\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\5.6.3\\swashbuckle.aspnetcore.swaggergen.5.6.3.nupkg.sha512",
+    "C:\\Users\\byron\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\5.6.3\\swashbuckle.aspnetcore.swaggerui.5.6.3.nupkg.sha512"
+  ],
+  "logs": []
+}
