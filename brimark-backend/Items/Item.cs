@@ -9,7 +9,6 @@ namespace brimark_backend
 {
     public class Item
     {
-
         public String ID { set; get; }
 
         public string ListingName { set; get; }

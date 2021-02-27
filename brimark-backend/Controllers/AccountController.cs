@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
+// TODO: Determine Valid IPs or however we want to do that
+// TODO: Validate and connect to database
 namespace brimark_backend.Controllers
 {
     [ApiController]
@@ -18,19 +17,45 @@ namespace brimark_backend.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public IEnumerable<Account> Get()
+        [HttpPost]
+        public Account Post(String id)
         {
-            return Enumerable.Range(1, 5).Select(Index => new Account
+            // Future
+            bool validIP = true;
+
+            if (validIP)
+            { 
+                if (Utils.Validate.IdIsValid(id))
+                {
+                    // OK: 200
+                    this.HttpContext.Response.StatusCode = 200;
+                    return new Account()
+                    {
+                        ProfilePicture = DataGenerator.MakeId(),
+                        Name = DataGenerator.MakeName(),
+                        AccountCreated = DataGenerator.MakeDate(2015),
+                        ItemsSold = DataGenerator.GetRng().Next(250),
+                        SellerRating = (sbyte)DataGenerator.GetRng().Next(6, 10),
+                        CountryCode = "GB",
+                    };   
+                }
+                else
+                {
+                    // Invalid Format: 400
+                    this.HttpContext.Response.StatusCode = 400;
+                    return null;
+                }
+            } else
             {
-                ProfilePicture = DataGenerator.MakeId(),
-                Name = DataGenerator.MakeName(),
-                AccountCreated = DataGenerator.MakeDate(2015),
-                ItemsSold = DataGenerator.GetRng().Next(250),
-                SellerRating = (sbyte)DataGenerator.GetRng().Next(6, 10),
-                CountryCode = "GB",
-            }).ToArray();
+                // Forbidden: 403
+                this.HttpContext.Response.StatusCode = 403;
+                return null;
+            }
+
+            
         }
+
+
 
     }
 }
