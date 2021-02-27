@@ -32,6 +32,9 @@ namespace brimark_backend.Controllers
                 {
                     if (validPw)
                     {
+                        // OK: 200
+                        this.HttpContext.Response.StatusCode = 200;
+
                         return new User()
                         {
                             /* Account Data */
