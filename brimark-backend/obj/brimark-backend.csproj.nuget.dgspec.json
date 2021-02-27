@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\byron\\Documents\\dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj": {}
+    "C:\\Users\\byron\\Documents\\Dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\byron\\Documents\\dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj": {
+    "C:\\Users\\byron\\Documents\\Dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\byron\\Documents\\dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj",
+        "projectUniqueName": "C:\\Users\\byron\\Documents\\Dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj",
         "projectName": "brimark-backend",
-        "projectPath": "C:\\Users\\byron\\Documents\\dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj",
+        "projectPath": "C:\\Users\\byron\\Documents\\Dev\\brimark-backend\\brimark-backend\\brimark-backend.csproj",
         "packagesPath": "C:\\Users\\byron\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\byron\\Documents\\dev\\brimark-backend\\brimark-backend\\obj\\",
+        "outputPath": "C:\\Users\\byron\\Documents\\Dev\\brimark-backend\\brimark-backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -46,6 +46,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[5.6.3, )"
+            },
+            "System.Collections.NonGeneric": {
+              "target": "Package",
+              "version": "[4.3.0, )"
             }
           },
           "imports": [
