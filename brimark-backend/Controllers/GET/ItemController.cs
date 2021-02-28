@@ -19,7 +19,7 @@ namespace brimark_backend.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
+        [HttpGet]
         public Item Get(String id)
         {
             // Future
