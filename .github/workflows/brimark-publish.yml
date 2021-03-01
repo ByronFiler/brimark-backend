@@ -20,11 +20,11 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration Release --no-build --verbosity normal
     - name: Publish
-      run: dotnet publish --configuration Release --no-restore --output ./publish --self-contained true --runtime linux-x64 -p:PublishTrimmed=true
+      run: dotnet publish --configuration Release --output ./publish --self-contained true --runtime linux-x64 -p:PublishTrimmed=true
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
