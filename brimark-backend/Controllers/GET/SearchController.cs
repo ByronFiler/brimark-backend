@@ -20,7 +20,7 @@ namespace brimark_backend.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
+        [HttpGet]
         public IEnumerable<Search> Get(String query)
         {
             // Future

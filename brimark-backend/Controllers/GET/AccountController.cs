@@ -17,7 +17,7 @@ namespace brimark_backend.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
+        [HttpGet]
         public Account Post(String id)
         {
             // Future
