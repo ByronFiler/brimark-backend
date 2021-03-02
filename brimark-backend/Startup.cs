@@ -56,12 +56,12 @@ namespace brimark_backend
 
             app.UseAuthentication();
 
-            //if (env.IsDevelopment())
-            //{
+            if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "brimark_backend v1"));
-            //}
+            }
 
             app.UseRouting();
 
