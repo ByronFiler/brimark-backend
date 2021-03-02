@@ -26,9 +26,7 @@ jobs:
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish --runtime linux-x64 -p:PublishTrimmed=true
     - name: SFTP
-      uses: fabeabe/git-sftp-action@1.1.1
+      uses: Atyn/simple-sftp-action@0.0.2
       with:
-        url: sftp://connieprice.co.uk
-        user: brimark-api
-        password: ${{ secrets.ftp_password }}
-        remoteroot: /home/runner/work/brimark-backend/brimark-backend/publish/
+        url: sftp://brimark-api:${{ secrets.ftp_password }}@connieprice.co.uk
+        localdir: /home/runner/work/brimark-backend/brimark-backend/publish/
