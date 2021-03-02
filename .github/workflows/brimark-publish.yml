@@ -25,10 +25,10 @@ jobs:
       run: dotnet test --configuration Release --no-build --verbosity normal
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish --runtime linux-x64 -p:PublishTrimmed=true
-    - name: SFTP uploader
-      uses: wangyucode/sftp-upload-action@v1.1
+    - name: SFTP
+      uses: fabeabe/git-sftp-action@1.1.1
       with:
-        host: connieprice.co.uk
-        username: brimark-api
+        url: connieprice.co.uk
+        user: brimark-api
         password: ${{ secrets.ftp_password }}
-        localDir: /home/runner/work/brimark-backend/brimark-backend/publish/
+        remoteroot: /home/runner/work/brimark-backend/brimark-backend/publish/
