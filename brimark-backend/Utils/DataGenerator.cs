@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace brimark_backend
@@ -91,6 +92,11 @@ namespace brimark_backend
             x.RemoveRange(0, (int)(x.Count() * 0.7));
             return String.Join(" ", x);
 
+        }
+
+        public static string MakeHash()
+        {
+            return BitConverter.ToString(MD5.Create().ComputeHash(Guid.NewGuid().ToByteArray())).Replace("-", "").ToLower();
         }
 
 

@@ -44,12 +44,13 @@ namespace brimark_backend.Controllers
                         && Utils.Validate.IsValidPassword(password)
                     )
                 {
-                    string ActivationHash = BitConverter.ToString(MD5.Create().ComputeHash(Guid.NewGuid().ToByteArray())).Replace("-", "").ToLower();
-
+                    
                     // Write to database
                     if (successfulDatabase)
                     {
                         // Send Validation Email
+
+                        Utils.Database.POST.CreateAccount(username, email, "password", "GB");
 
                         // 201: Created (Account created in database)
 

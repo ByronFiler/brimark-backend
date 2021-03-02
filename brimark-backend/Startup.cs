@@ -63,6 +63,12 @@ namespace brimark_backend
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "brimark_backend v1"));
             }
 
+            // Don't delete until a suitable alternative is found ok
+            Utils.Database.DBConnection.X();
+            Utils.Data.GetEmail();
+
+            app.UseHttpsRedirection();
+
             app.UseRouting();
 
             app.UseCors(CORSOrigins);
