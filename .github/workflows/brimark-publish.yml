@@ -26,7 +26,10 @@ jobs:
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish --runtime linux-x64 -p:PublishTrimmed=true
     - name: SFTP
-      uses: Atyn/simple-sftp-action@0.0.2
+      uses: MajorVengeance/Ftp-Deploy-Action@v0.2.3-alpha
       with:
-        url: sftp://brimark-api:${{ secrets.ftp_password }}@connieprice.co.uk
-        localdir: /home/runner/work/brimark-backend/brimark-backend/publish/
+        ftp_host: connieprice.co.uk
+        ftp_username: brimark-api
+        ftp_password: ${{ secrets.ftp_password }}
+        local_source_dir: /home/runner/work/brimark-backend/brimark-backend/publish/
+        disable_ssl_certificate_verification: false
