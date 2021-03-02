@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test --configuration Release --no-build --verbosity normal
     - name: Publish
-      run: dotnet publish --configuration Release --output ./publish --self-contained true --runtime linux-x64 -p:PublishTrimmed=true
+      run: dotnet publish --configuration Release --output ./publish --runtime linux-x64 -p:PublishTrimmed=true
     - name: FTP Deployment
       uses: airvzxf/ftp-deployment-action@latest
       with:
@@ -32,4 +32,3 @@ jobs:
         user: brimark-api
         password: ${{ secrets.ftp_password }}
         local_dir: /home/runner/work/brimark-backend/brimark-backend/publish/
-        ftp_ssl_allow: true
