@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
 
@@ -19,10 +20,11 @@ namespace brimark_backend.Utils.Mail
         public MailWorker() : base()
         {
 
+            Dictionary<string, string> email = Data.GetEmail();
             this.client = new SmtpClient("smtp.gmail.com")
             {
                 Port = 587,
-                Credentials = new NetworkCredential(brimarkEmail, brimarkPassword),
+                Credentials = new NetworkCredential(email["email"], email["password"]),
                 EnableSsl = true,
             };
 
