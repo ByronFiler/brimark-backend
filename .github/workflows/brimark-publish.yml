@@ -28,7 +28,7 @@ jobs:
     - name: SFTP
       uses: fabeabe/git-sftp-action@1.1.1
       with:
-        url: connieprice.co.uk
+        url: sftp://connieprice.co.uk
         user: brimark-api
         password: ${{ secrets.ftp_password }}
         remoteroot: /home/runner/work/brimark-backend/brimark-backend/publish/
