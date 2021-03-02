@@ -25,11 +25,11 @@ jobs:
       run: dotnet test --configuration Release --no-build --verbosity normal
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish --self-contained true --runtime linux-x64 -p:PublishTrimmed=true
-    - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+    - name: FTP Deployment
+      uses: airvzxf/ftp-deployment-action@latest
       with:
         server: connieprice.co.uk
-        username: brimark-api
+        user: brimark-api
         password: ${{ secrets.ftp_password }}
-        protocol: ftps
-        local-dir: /home/runner/work/brimark-backend/brimark-backend/publish/
+        local_dir: /home/runner/work/brimark-backend/brimark-backend/publish/
+        ftp_ssl_allow: true
