@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -23,9 +24,20 @@ namespace brimark_backend
 
         public IConfiguration Configuration { get; }
 
+        readonly string CORSOrigins = "_corsOrigins";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => {
+                options.AddPolicy(name: CORSOrigins,
+                    builder => {
+                        builder.WithOrigins(
+                            "https://brimark.connieprice.co.uk"
+                        );
+                    }
+                );
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -37,6 +49,13 @@ namespace brimark_backend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Some extra stuff to handle the Apache reverse proxy when the application is published.
+            app.UseForwardedHeaders(new ForwardedHeadersOptions {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
+            app.UseAuthentication();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -51,6 +70,8 @@ namespace brimark_backend
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(CORSOrigins);
 
             app.UseAuthorization();
 
