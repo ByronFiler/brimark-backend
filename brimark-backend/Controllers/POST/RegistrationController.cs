@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,11 +17,7 @@ namespace brimark_backend.Controllers
     [Route("[controller]")]
     public class RegistrationController : ControllerBase
     {
-
-        string ip = "127.0.0.1";
-        bool validIp = true;
-        bool successfulDatabase = true;
-
+        private static readonly string responceBody = "{\"error\": \"duplicate_data\", \"duplicates\": [{0}]}";
         private readonly ILogger<RegistrationController> _logger;
 
         public RegistrationController(ILogger<RegistrationController> logger)
@@ -35,47 +32,66 @@ namespace brimark_backend.Controllers
             String password
             )
         {
-            if (validIp)
+            
+            // Validate data on Client Side & Server Side as Client Side can be Manipulated
+            if (
+                    Utils.Validate.IsAlphanumerical(username) && username.Length <= 16
+                    && Utils.Validate.IsValidEmail(email) && email.Length <= 64
+                    && Utils.Validate.IsValidPassword(password)
+                )
             {
-                // Validate data on Client Side & Server Side as Client Side can be Manipulated
-                if (
-                        Utils.Validate.IsAlphanumerical(username) && username.Length <= 16
-                        && Utils.Validate.IsValidEmail(email) && email.Length <= 64
-                        && Utils.Validate.IsValidPassword(password)
-                    )
+                switch (Utils.Database.POST.CreateAccount(username, password, email))
                 {
-                    
-                    // Write to database
-                    if (successfulDatabase)
-                    {
-                        Utils.Database.POST.CreateAccount(username, password, email);
-
-                        // Send Validation Email
-
-                        // 201: Created (Account created in database)
-
+                    case Utils.Status.OK:
+                        // 201: Created (Account Created)
                         return StatusCode(201);
 
-                    } else
-                    {
-                        // 500: Internal Server Error (Database Failure)
+                    case Utils.Status.DUPLICATE_EMAIL:
+
+                        // Writing Body Message
+                        byte[] emailDuplicatedBody = Encoding.UTF8.GetBytes(String.Format(responceBody, "email"));
+                        Response.ContentType = "application/json";
+                        Response.Body.Write(emailDuplicatedBody, 0, emailDuplicatedBody.Length);
+
+                        // 206: Not Acceptable (Duplicate Email)
+                        return StatusCode(206);
+
+                    case Utils.Status.DUPLICATE_USERNAME:
+
+                        // Writing Body Message
+                        byte[] usernameDuplicatedBody = Encoding.UTF8.GetBytes(String.Format(responceBody, "username"));
+                        Response.ContentType = "application/json";
+                        Response.Body.Write(usernameDuplicatedBody, 0, usernameDuplicatedBody.Length);
+
+                        // 206: Not Acceptable (Duplicate Email)
+                        return StatusCode(206);
+
+                    case Utils.Status.DUPLICATE_EMAIL_AND_USERNAME:
+
+                        // Writing Body Message
+                        byte[] bothDuplicatesBody = Encoding.UTF8.GetBytes(String.Format(responceBody, "email, username"));
+                        Response.ContentType = "application/json";
+                        Response.Body.Write(bothDuplicatesBody, 0, bothDuplicatesBody.Length);
+
+                        // 206: Not Acceptable (Duplicate Email)
+                        return StatusCode(206);
+
+                    case Utils.Status.DATABASE_FAILURE:
                         _logger.LogError("Database Failure when Attempting to Create Account");
+
+                        // 500: Internal Server Error (Database Failure)
                         return StatusCode(500);
 
-                    }
-
-                } else
-                {
-                    // 400: Bad Request (Invalid Form Data)
-                    _logger.LogWarning(String.Format("Invalid Data Given from Whitelisted IP ({0}), user either manipulating form or a form has an error.", ip));
-                    return StatusCode(400);
+                    default:
+                        // 500: Internal Server Error (Unimplemented Status, Should Never Happen)
+                        return StatusCode(500);
                 }
             } else
             {
-                // 403: Forbidden (Non Whitelisted IP)
-                _logger.LogWarning("Access attempted non whitelisted ip: " + ip);
-                return StatusCode(403);
+                // 400: Bad Request (Invalid Form Data)
+                return StatusCode(400);
             }
+            
             
             
         }

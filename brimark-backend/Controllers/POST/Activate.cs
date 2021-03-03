@@ -37,6 +37,7 @@ namespace brimark_backend.Controllers
                     case Utils.Status.ALREADY_ACTIVATED:
 
                         byte[] alreadyActivatedBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "ALREADY_ACTIVATED"));
+                        Response.ContentType = "application/json";
                         Response.Body.Write(alreadyActivatedBody, 0, alreadyActivatedBody.Length);
 
                         // 204: No Content (Account Already Activated)
@@ -45,6 +46,7 @@ namespace brimark_backend.Controllers
                     case Utils.Status.NO_MATCHING_ACCOUNT:
 
                         byte[] noMatchingAccountBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "NO_MATCHING_ACCOUNT"));
+                        Response.ContentType = "application/json";
                         Response.Body.Write(noMatchingAccountBody, 0, noMatchingAccountBody.Length);
 
                         // 204: No Content (No Matching Account)

@@ -8,13 +8,18 @@ namespace brimark_backend.Utils
     public enum Status
     {
 
-        // General ()
+        // General 
         OK,
         DATABASE_FAILURE,
 
         // Activate Account
         ALREADY_ACTIVATED,
-        NO_MATCHING_ACCOUNT
+        NO_MATCHING_ACCOUNT,
+
+        // Create Account
+        DUPLICATE_EMAIL,
+        DUPLICATE_USERNAME, 
+        DUPLICATE_EMAIL_AND_USERNAME
 
     }
 }

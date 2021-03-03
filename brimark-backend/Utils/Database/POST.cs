@@ -52,34 +52,48 @@ namespace brimark_backend.Utils.Database
 
 
         // Create Account
-        public static bool CreateAccount(
+        public static Status CreateAccount(
             String name,
             String password,
             String email
 
             )
         { 
-            nameParameter.Value = name;
-            passwordParameter.Value = encrypt(password);
-            emailParameter.Value = email;
-            profilePictureParameter.Value = "PF" + DataGenerator.MakeId();
-            activationHashParameter.Value = DataGenerator.MakeHash();
+            try
+            {
+                nameParameter.Value = name;
+                passwordParameter.Value = encrypt(password);
+                emailParameter.Value = email;
+                profilePictureParameter.Value = "PF" + DataGenerator.MakeId();
+                activationHashParameter.Value = DataGenerator.MakeHash();
 
-            createAccountSql.Parameters.Add(nameParameter);
-            createAccountSql.Parameters.Add(passwordParameter);
-            createAccountSql.Parameters.Add(emailParameter);
-            createAccountSql.Parameters.Add(profilePictureParameter);
-            createAccountSql.Parameters.Add(activationHashParameter);
+                createAccountSql.Parameters.Add(nameParameter);
+                createAccountSql.Parameters.Add(passwordParameter);
+                createAccountSql.Parameters.Add(emailParameter);
+                createAccountSql.Parameters.Add(profilePictureParameter);
+                createAccountSql.Parameters.Add(activationHashParameter);
 
-            createAccountSql.Prepare();
-            createAccountSql.ExecuteNonQuery();
+                createAccountSql.Prepare();
+                createAccountSql.ExecuteNonQuery();
 
-            delete.Prepare();
-            delete.ExecuteNonQuery();
+                delete.Prepare();
+                delete.ExecuteNonQuery();
 
-            Utils.Mail.MailManager.Poke();
+                Mail.MailManager.Poke();
 
-            return true;
+                return Status.OK;
+
+            } catch (MySqlException e)
+            {
+
+                // Check against duplicate entries
+
+                return Status.DATABASE_FAILURE;
+
+            }
+            
+
+            
         }
 
         public static Status activate(String activationHash)
