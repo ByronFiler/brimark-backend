@@ -48,9 +48,9 @@ namespace brimark_backend.Controllers
                     // Write to database
                     if (successfulDatabase)
                     {
-                        // Send Validation Email
+                        Utils.Database.POST.CreateAccount(username, password, email);
 
-                        Utils.Database.POST.CreateAccount(username, email, "password", "GB");
+                        // Send Validation Email
 
                         // 201: Created (Account created in database)
 

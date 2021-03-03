@@ -20,7 +20,7 @@ namespace brimark_backend.Utils
                     Dictionary<string, Dictionary<string, string>> items = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
 
                     email = items["email"];
-                    database = items["database_local"];
+                    database = items["database"];
                 }
             } catch (IOException e)
             {

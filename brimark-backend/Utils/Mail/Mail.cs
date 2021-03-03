@@ -11,13 +11,19 @@ namespace brimark_backend.Utils.Mail
             get { return UserEmail; }
             set { UserEmail = value; }
         }
+        public string Username
+        {
+            get { return Username; }
+            set { Username = value; }
+        }
         public string Hash { 
             get { return Hash; }
             set { Hash = value; }
         }
-        public Mail(String userEmail, String hash)
+        public Mail(String userEmail, String username, String hash)
         {
             this.UserEmail = userEmail;
+            this.Username = username;
             this.Hash = hash;
         }
     }

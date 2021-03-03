@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 // developer=brimark
-// create JSON and store passwords
+// Create account SQL syntax errors due to some MySqlClient bug, have to do two separate statements for it to work which is annoying
 
 namespace brimark_backend.Utils.Database
 {
@@ -15,10 +15,12 @@ namespace brimark_backend.Utils.Database
     {
         // Force Setting Parameters
         private static readonly MySqlCommand createAccountSql = new MySqlCommand(
-            "INSERT INTO `accounts` (name, password, email, country_code, activation_hash, profile_picture) VALUES (@name, @password, @email, @country_code, @activation_hash, @profile_picture);" +
-            "INSERT INTO `emails` (recipient, username, hash) VALUES (@email, @name, @activation_hash);",
-            null
+            @"INSERT INTO `accounts` (name, password, email, activation_hash, profile_picture) VALUES (@name, @password, @email, @activation_hash, @profile_picture);"
             );
+        private static readonly MySqlCommand delete = new MySqlCommand(
+            @"INSERT INTO `emails` (accountId) VALUES ((SELECT id FROM `accounts` WHERE id = (SELECT MAX(id) FROM `accounts`)));"
+            );
+
         private readonly static MySqlCommand activateAccountSql = new MySqlCommand(
             "UPDATE `accounts` SET activated=1 WHERE activation_hash=@activation_hash;" +
             "UPDATE `emails` SET sent=1, date_sent=@date WHERE activation_hash=@activation_hash;",
@@ -33,49 +35,46 @@ namespace brimark_backend.Utils.Database
         private static readonly MySqlParameter nameParameter = new MySqlParameter("@name", MySqlDbType.VarChar, 32);
         private static readonly MySqlParameter passwordParameter = new MySqlParameter("@password", MySqlDbType.VarChar, 64);
         private static readonly MySqlParameter emailParameter = new MySqlParameter("@email", MySqlDbType.VarChar, 64);
-        private static readonly MySqlParameter countryParameter = new MySqlParameter("@country_code", MySqlDbType.VarChar, 2);
 
         private static readonly MySqlParameter activationHashParameter = new MySqlParameter("@activation_hash", MySqlDbType.VarChar, 32);
-
         private static readonly MySqlParameter dateParameter = new MySqlParameter("@date", MySqlDbType.Date, 10);
-        
         private static readonly MySqlParameter profilePictureParameter = new MySqlParameter("@profile_picture", MySqlDbType.VarChar, 10);
 
         public static void SetConnection(MySqlConnection connection)
         {
             POST.createAccountSql.Connection = connection;
             POST.activateAccountSql.Connection = connection;
+            POST.delete.Connection = connection;
         }
 
 
         // Create Account
         public static bool CreateAccount(
-            
             String name,
             String password,
-            String email,
-            String country
+            String email
 
             )
-        {
+        { 
             nameParameter.Value = name;
             passwordParameter.Value = encrypt(password);
             emailParameter.Value = email;
-            countryParameter.Value = country;
-
             profilePictureParameter.Value = "PF" + DataGenerator.MakeId();
             activationHashParameter.Value = DataGenerator.MakeHash();
 
             createAccountSql.Parameters.Add(nameParameter);
             createAccountSql.Parameters.Add(passwordParameter);
             createAccountSql.Parameters.Add(emailParameter);
-            createAccountSql.Parameters.Add(countryParameter);
-
             createAccountSql.Parameters.Add(profilePictureParameter);
             createAccountSql.Parameters.Add(activationHashParameter);
 
             createAccountSql.Prepare();
             createAccountSql.ExecuteNonQuery();
+
+            delete.Prepare();
+            delete.ExecuteNonQuery();
+
+            Utils.Mail.MailManager.Poke();
 
             return true;
         }
