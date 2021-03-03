@@ -22,10 +22,12 @@ namespace brimark_backend.Utils.Database
             );
 
         private readonly static MySqlCommand activateAccountSql = new MySqlCommand(
-            "UPDATE `accounts` SET activated=1 WHERE activation_hash=@activation_hash;" +
-            "UPDATE `emails` SET sent=1, date_sent=@date WHERE activation_hash=@activation_hash;",
-            null
+            @"UPDATE `accounts` SET activated=1 WHERE activation_hash=@activation_hash;"
             );
+        private readonly static MySqlCommand checkHash = new MySqlCommand(
+            @"SELECT * FROM `accounts` WHERE activation_hash=@activation_hash AND activated=1;"
+            );
+
         private readonly static MySqlCommand createListingSql = new MySqlCommand(
             "INSERT INTO `items` () VALUES ()" +
             "UPDATE `users` SET ",
@@ -35,10 +37,11 @@ namespace brimark_backend.Utils.Database
         private static readonly MySqlParameter nameParameter = new MySqlParameter("@name", MySqlDbType.VarChar, 32);
         private static readonly MySqlParameter passwordParameter = new MySqlParameter("@password", MySqlDbType.VarChar, 64);
         private static readonly MySqlParameter emailParameter = new MySqlParameter("@email", MySqlDbType.VarChar, 64);
-
         private static readonly MySqlParameter activationHashParameter = new MySqlParameter("@activation_hash", MySqlDbType.VarChar, 32);
-        private static readonly MySqlParameter dateParameter = new MySqlParameter("@date", MySqlDbType.Date, 10);
         private static readonly MySqlParameter profilePictureParameter = new MySqlParameter("@profile_picture", MySqlDbType.VarChar, 10);
+
+        //private static readonly MySqlParameter dateParameter = new MySqlParameter("@date", MySqlDbType.Date, 10);
+
 
         public static void SetConnection(MySqlConnection connection)
         {
@@ -79,16 +82,41 @@ namespace brimark_backend.Utils.Database
             return true;
         }
 
-        public static void activate(String activationHash)
+        public static Status activate(String activationHash)
         {
-            activationHashParameter.Value = activationHash;
-            dateParameter.Value = DateTime.Now.ToString("yyyy-mm-dd");
+            try
+            {
+                activationHashParameter.Value = activationHash;
+                activateAccountSql.Parameters.Add(activationHashParameter);
 
-            activateAccountSql.Parameters.Add(dateParameter);
-            activateAccountSql.Parameters.Add(activationHashParameter);
+                activateAccountSql.Prepare();
+                int effectedRows = activateAccountSql.ExecuteNonQuery();
 
-            activateAccountSql.Prepare();
-            activateAccountSql.ExecuteNonQuery();
+                if (effectedRows == 0)
+                {
+                    // Did not activate, does an account exist
+
+                    checkHash.Parameters.Add(activationHash);
+
+                    using (MySqlDataReader activatedAccount = checkHash.ExecuteReader())
+                    {
+                        return activatedAccount.Read() ? Status.ALREADY_ACTIVATED : Status.NO_MATCHING_ACCOUNT;
+                    }
+
+                }
+                else
+                {
+                    // Activated successfully
+                    return Status.OK;
+                }
+
+                // Should return: internal failure, activated, already activated, no matching account (assume that the thingy is already checked as valid)
+            } catch (MySqlException e)
+            {
+                return Status.DATABASE_FAILURE;
+            }
+
+
         }
 
         public static void createListing(

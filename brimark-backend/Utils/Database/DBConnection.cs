@@ -62,7 +62,7 @@ namespace brimark_backend.Utils.Database
 
         public static void X()
         {
-
+            // Don't delete
         }
 
     }

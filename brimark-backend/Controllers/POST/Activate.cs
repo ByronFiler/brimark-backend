@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Text;
 
 namespace brimark_backend.Controllers
 {
@@ -8,9 +9,10 @@ namespace brimark_backend.Controllers
     [Route("[controller]")]
     public class Activate : ControllerBase
     {
-
         private readonly ILogger<Activate> _logger;
 
+        private static readonly string responseBody = "{\"response\":\"{0}\"";
+       
         public Activate(ILogger<Activate> logger)
         {
             _logger = logger;
@@ -21,50 +23,48 @@ namespace brimark_backend.Controllers
         {
 
             // Still needs a valid IP, as it will be accessed by a clean page that will use this
-            bool validIp = true;
-            bool workingDatabase = true;
-            bool validRequest = true;
-
-            if (validIp)
+            if (
+                Utils.Validate.IsAlphanumerical(hash) && hash.Length == 32
+                )
             {
-
-                if (
-                    Utils.Validate.IsAlphanumerical(hash) && hash.Length == 32
-                    )
+                switch (Utils.Database.POST.activate(hash))
                 {
+                    case Utils.Status.OK:
 
-                    if (workingDatabase)
-                    {
-                        if (validRequest)
-                        {
-                            // 201: Created (Account Activated)
-                            return StatusCode(201);
-                        }
-                        else
-                        {
-                            // 403: Forbidden (Account activation timeout window passed)
-                            // Should probs inform user here too?
-                            return StatusCode(403);
-                        }
-                    }
-                    else
-                    {
-                        // 500: Internal Server Error (Databas Failure)
+                        // 201: Created (Account Activated)
+                        return StatusCode(201);
+
+                    case Utils.Status.ALREADY_ACTIVATED:
+
+                        byte[] alreadyActivatedBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "ALREADY_ACTIVATED"));
+                        Response.Body.Write(alreadyActivatedBody, 0, alreadyActivatedBody.Length);
+
+                        // 204: No Content (Account Already Activated)
+                        return StatusCode(204);
+
+                    case Utils.Status.NO_MATCHING_ACCOUNT:
+
+                        byte[] noMatchingAccountBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "NO_MATCHING_ACCOUNT"));
+                        Response.Body.Write(noMatchingAccountBody, 0, noMatchingAccountBody.Length);
+
+                        // 204: No Content (No Matching Account)
+                        return StatusCode(204);
+
+                    case Utils.Status.DATABASE_FAILURE:
+
+                        // 500: Internal Server Error (Database Failure)
                         return StatusCode(500);
-                    }
 
-                } else
-                {
-                    // Invalid Request: 400 (Invalid Parameters)
-                    return StatusCode(400);
+                    default:
 
+                        // 500: Internal Server Error (Unimplemented Status, Should Never Happen)
+                        return StatusCode(500);
                 }
             } else
             {
-                // Forbidden: 403 (Non Whitelisted-IP)
-                return StatusCode(403);
-            }
-
+                // 400: Bad Request (Invalid Parameters)
+                return StatusCode(400);
+            }  
 
         }
 
