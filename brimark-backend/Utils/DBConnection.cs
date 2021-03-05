@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 
+// Refactor this so the connection is just created with a get method it's a bit cleaner just requires refactoring some other stuff 
+
 namespace brimark_backend.Utils.Database
 {
 
@@ -9,9 +11,8 @@ namespace brimark_backend.Utils.Database
     {
         private static MySqlConnection connection;
 
-        static DBConnection()
+        public static void Connect()
         {
-
             try
             {
                 // This is never called
@@ -31,8 +32,12 @@ namespace brimark_backend.Utils.Database
                 try
                 {
                     connection.Open();
-                    POST.SetConnection(connection);
-                    Utils.Mail.MailManager.SetConnection(connection);
+
+                    Mail.MailManager.SetConnection(connection);
+                    Controllers.LoginController.SetConnection(connection);
+                    Controllers.AccountController.SetConnection(connection);
+                    Controllers.RegistrationController.SetConnection(connection);
+
                     System.Diagnostics.Debug.WriteLine("Database Connection Established");
 
 
@@ -45,24 +50,13 @@ namespace brimark_backend.Utils.Database
                     System.Environment.Exit(1);
                     // Not very good, database is unreachable
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine("[FATAL] Unknown Exception");
                 System.Diagnostics.Debug.WriteLine("Cause -> " + e.Message);
                 System.Environment.Exit(1);
             }
-
-            
-
-        }
-        private static MySqlConnection GetConnection()
-        {
-            return connection;
-        }
-
-        public static void X()
-        {
-            // Don't delete
         }
 
     }

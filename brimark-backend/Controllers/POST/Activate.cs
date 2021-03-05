@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
 using System;
 using System.Text;
 
@@ -9,6 +10,16 @@ namespace brimark_backend.Controllers
     [Route("[controller]")]
     public class Activate : ControllerBase
     {
+
+        private readonly static MySqlCommand activateAccountSql = new MySqlCommand(
+            @"UPDATE `accounts` SET activated=1 WHERE activation_hash=@activation_hash;"
+            );
+        private readonly static MySqlCommand checkHash = new MySqlCommand(
+            @"SELECT * FROM `accounts` WHERE activation_hash=@activation_hash AND activated=1;"
+            );
+
+        private static readonly MySqlParameter activationHashParameter = new MySqlParameter("@activation_hash", MySqlDbType.VarChar, 32);
+
         private readonly ILogger<Activate> _logger;
 
         private static readonly string responseBody = "{\"response\":\"{0}\"";
@@ -27,41 +38,58 @@ namespace brimark_backend.Controllers
                 Utils.Validate.IsAlphanumerical(hash) && hash.Length == 32
                 )
             {
-                switch (Utils.Database.POST.activate(hash))
+                try
                 {
-                    case Utils.Status.OK:
+                    activationHashParameter.Value = hash;
+                    activateAccountSql.Parameters.Add(activationHashParameter);
 
-                        // 201: Created (Account Activated)
-                        return StatusCode(201);
+                    activateAccountSql.Prepare();
+                    int effectedRows = activateAccountSql.ExecuteNonQuery();
 
-                    case Utils.Status.ALREADY_ACTIVATED:
+                    if (effectedRows == 0)
+                    {
+                        // Did not activate, does an account exist
 
-                        byte[] alreadyActivatedBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "ALREADY_ACTIVATED"));
-                        Response.ContentType = "application/json";
-                        Response.Body.Write(alreadyActivatedBody, 0, alreadyActivatedBody.Length);
+                        checkHash.Parameters.Add(activationHashParameter);
 
-                        // 204: No Content (Account Already Activated)
-                        return StatusCode(204);
+                        using (MySqlDataReader activatedAccount = checkHash.ExecuteReader())
+                        {
 
-                    case Utils.Status.NO_MATCHING_ACCOUNT:
+                            if (activatedAccount.HasRows)
+                            {
+                                byte[] alreadyActivatedBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "ALREADY_ACTIVATED"));
+                                Response.ContentType = "application/json";
+                                Response.Body.Write(alreadyActivatedBody, 0, alreadyActivatedBody.Length);
 
-                        byte[] noMatchingAccountBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "NO_MATCHING_ACCOUNT"));
-                        Response.ContentType = "application/json";
-                        Response.Body.Write(noMatchingAccountBody, 0, noMatchingAccountBody.Length);
+                                // 204: No Content (Account Already Activated)
+                                return StatusCode(204);
+                            } else
+                            {
+                                byte[] noMatchingAccountBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "NO_MATCHING_ACCOUNT"));
+                                Response.ContentType = "application/json";
+                                Response.Body.Write(noMatchingAccountBody, 0, noMatchingAccountBody.Length);
 
-                        // 204: No Content (No Matching Account)
-                        return StatusCode(204);
+                                // 204: No Content (No Matching Account)
+                                return StatusCode(204);
+                            }
+                        }
 
-                    case Utils.Status.DATABASE_FAILURE:
+                    }
+                    else
+                    {
+                        // Activated successfully
+                        return StatusCode(200);
+                    }
 
-                        // 500: Internal Server Error (Database Failure)
-                        return StatusCode(500);
-
-                    default:
-
-                        // 500: Internal Server Error (Unimplemented Status, Should Never Happen)
-                        return StatusCode(500);
+                    // Should return: internal failure, activated, already activated, no matching account (assume that the thingy is already checked as valid)
                 }
+                catch (MySqlException e)
+                {
+                    // 500: Internal Server Error (Database Failure)
+                    return StatusCode(500);
+                }
+
+                
             } else
             {
                 // 400: Bad Request (Invalid Parameters)
