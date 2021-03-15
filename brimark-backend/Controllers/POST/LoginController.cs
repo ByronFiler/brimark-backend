@@ -16,7 +16,7 @@ namespace brimark_backend.Controllers
     {
         private readonly ILogger<LoginController> _logger;
 
-        private static readonly string responseBody = "{\"error\":\"{0}\"";
+        private static readonly string responseBody = "{{\"error\":\"{0}\"}}";
 
         private static readonly MySqlCommand loginWithEmail = new MySqlCommand("SELECT * FROM `accounts` WHERE email=@email AND password=@password;");
         private static readonly MySqlCommand loginWithUsername = new MySqlCommand("SELECT * FROM `accounts` WHERE name=@name AND password=@password;");
@@ -42,6 +42,7 @@ namespace brimark_backend.Controllers
                     emailParameter.Value = usernameOrEmail;
                     passwordParameter.Value = Utils.Encryption.hash(password);
 
+                    loginWithEmail.Parameters.Clear();
                     loginWithEmail.Parameters.Add(emailParameter);
                     loginWithEmail.Parameters.Add(passwordParameter);
 
@@ -93,13 +94,13 @@ namespace brimark_backend.Controllers
                 {
                     // User has not activated their account do not allow them to login
 
+                    // 403: Forbidden (Has not activated their account)
+                    this.HttpContext.Response.StatusCode = 403;
+
                     // Prepare body response informing
                     byte[] hasNotActivatedBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "HAS_NOT_ACTIVATED"));
                     Response.ContentType = "application/json";
                     Response.Body.Write(hasNotActivatedBody, 0, hasNotActivatedBody.Length);
-
-                    // 403: Forbidden (Has not activated their account)
-                    this.HttpContext.Response.StatusCode = 403;
                     return null;
                 }
             } else

@@ -46,6 +46,10 @@ namespace brimark_backend.Controllers
                 || (maximumPrice > 0)
                 )
             {
+
+                // loop through and build and that yeah
+                // cool!
+
                 // This is not the pretties so feel free to change this
                 searchQuery.Parameters.Clear();
                 if (!string.IsNullOrWhiteSpace(query))
