@@ -57,6 +57,7 @@ namespace brimark_backend.Utils.Mail
                 {
                     accountIdParameter.Value = accountId;
 
+                    getRelevantAccount.Parameters.Clear();
                     getRelevantAccount.Parameters.Add(accountIdParameter);
                     getRelevantAccount.Prepare();
 
