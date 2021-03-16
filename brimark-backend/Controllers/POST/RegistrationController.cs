@@ -59,6 +59,11 @@ namespace brimark_backend.Controllers
             _logger.LogInformation("email is null? " + (email == null));
             _logger.LogInformation("password is null? " + (password == null));
 
+            if (username == null || email == null || password == null)
+            {
+                // 400: Bad Request (Invalid Parameters)
+                return StatusCode(400);
+            }
 
             // Validate data on Client Side & Server Side as Client Side can be Manipulated
             if (

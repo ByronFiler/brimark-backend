@@ -96,7 +96,8 @@ namespace brimark_backend.Utils.Mail
                     {
                         dateParameter.Value = DateTime.Now.ToString("yyyy-MM-dd");
                         accountIdParameter.Value = accountId;
-                        
+
+                        markEmailSent.Parameters.Clear();
                         markEmailSent.Parameters.Add(dateParameter);
                         markEmailSent.Parameters.Add(accountIdParameter);
 
