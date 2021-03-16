@@ -37,6 +37,7 @@ namespace brimark_backend.Utils.Database
                     Controllers.LoginController.SetConnection(connection);
                     Controllers.AccountController.SetConnection(connection);
                     Controllers.RegistrationController.SetConnection(connection);
+                    Controllers.ActivateController.SetConnection(connection);
 
                     System.Diagnostics.Debug.WriteLine("Database Connection Established");
 
