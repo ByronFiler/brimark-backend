@@ -100,7 +100,7 @@ namespace brimark_backend.Controllers
                     // Prepare body response informing
                     byte[] hasNotActivatedBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "HAS_NOT_ACTIVATED"));
                     Response.ContentType = "application/json";
-                    Response.Body.Write(hasNotActivatedBody, 0, hasNotActivatedBody.Length);
+                    Response.Body.WriteAsync(hasNotActivatedBody, 0, hasNotActivatedBody.Length);
                     return null;
                 }
             } else
@@ -108,7 +108,7 @@ namespace brimark_backend.Controllers
                 // Responce Body
                 byte[] invalidCredentialsBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "INVALID_CREDENTIALS"));
                 Response.ContentType = "application/json";
-                Response.Body.Write(invalidCredentialsBody, 0, invalidCredentialsBody.Length);
+                Response.Body.WriteAsync(invalidCredentialsBody, 0, invalidCredentialsBody.Length);
 
                 // Forbidden: 403 (Invalid Username and Password)
                 this.HttpContext.Response.StatusCode = 403;
