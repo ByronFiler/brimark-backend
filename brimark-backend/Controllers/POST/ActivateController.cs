@@ -8,7 +8,7 @@ namespace brimark_backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class Activate : ControllerBase
+    public class ActivateController : ControllerBase
     {
 
         private readonly static MySqlCommand activateAccountSql = new MySqlCommand(
@@ -20,11 +20,11 @@ namespace brimark_backend.Controllers
 
         private static readonly MySqlParameter activationHashParameter = new MySqlParameter("@activation_hash", MySqlDbType.VarChar, 32);
 
-        private readonly ILogger<Activate> _logger;
+        private readonly ILogger<ActivateController> _logger;
 
         private static readonly string responseBody = "{{\"response\":\"{0}\"}}";
        
-        public Activate(ILogger<Activate> logger)
+        public ActivateController(ILogger<ActivateController> logger)
         {
             _logger = logger;
         }
@@ -55,20 +55,20 @@ namespace brimark_backend.Controllers
 
                             if (activatedAccount.HasRows)
                             {
+                                // 204: No Content (Account Already Activated)
+                                return StatusCode(204);
+
                                 byte[] alreadyActivatedBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "ALREADY_ACTIVATED"));
                                 Response.ContentType = "application/json";
                                 Response.Body.Write(alreadyActivatedBody, 0, alreadyActivatedBody.Length);
-
-                                // 204: No Content (Account Already Activated)
-                                return StatusCode(204);
                             } else
                             {
+                                // 204: No Content (No Matching Account)
+                                return StatusCode(204);
+
                                 byte[] noMatchingAccountBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "NO_MATCHING_ACCOUNT"));
                                 Response.ContentType = "application/json";
                                 Response.Body.Write(noMatchingAccountBody, 0, noMatchingAccountBody.Length);
-
-                                // 204: No Content (No Matching Account)
-                                return StatusCode(204);
                             }
                         }
 
@@ -94,6 +94,12 @@ namespace brimark_backend.Controllers
                 return StatusCode(400);
             }  
 
+        }
+
+        public static void SetConnection(MySqlConnection connection)
+        {
+            activateAccountSql.Connection = connection;
+            checkHash.Connection = connection;
         }
 
     }

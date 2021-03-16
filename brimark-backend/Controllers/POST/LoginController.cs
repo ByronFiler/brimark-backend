@@ -105,13 +105,13 @@ namespace brimark_backend.Controllers
                 }
             } else
             {
+                // Forbidden: 403 (Invalid Username and Password)
+                this.HttpContext.Response.StatusCode = 403;
+
                 // Responce Body
                 byte[] invalidCredentialsBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "INVALID_CREDENTIALS"));
                 Response.ContentType = "application/json";
                 Response.Body.Write(invalidCredentialsBody, 0, invalidCredentialsBody.Length);
-
-                // Forbidden: 403 (Invalid Username and Password)
-                this.HttpContext.Response.StatusCode = 403;
                 return null;
             }
         }
