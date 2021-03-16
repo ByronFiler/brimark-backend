@@ -7,8 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  Publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,4 +30,4 @@ jobs:
         ftp_host: connieprice.co.uk
         ftp_username: brimark-api
         ftp_password: ${{ secrets.ftp_password }}
-        local_source_dir: /home/runner/work/brimark-backend/brimark-backend/publish/
+        local_source_dir: /home/runner/work/brimark-backend/brimark-backend/publish/*
