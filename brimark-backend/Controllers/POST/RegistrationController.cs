@@ -54,7 +54,12 @@ namespace brimark_backend.Controllers
             String password
             )
         {
-            
+
+            _logger.LogInformation("username is null? " + (username == null));
+            _logger.LogInformation("email is null? " + (email == null));
+            _logger.LogInformation("password is null? " + (password == null));
+
+
             // Validate data on Client Side & Server Side as Client Side can be Manipulated
             if (
                     Utils.Validate.IsAlphanumerical(username) && username.Length <= 16
