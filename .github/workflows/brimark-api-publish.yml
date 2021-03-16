@@ -7,8 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  Publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,12 +23,11 @@ jobs:
     - name: Test
       run: dotnet test --configuration Release --no-build --verbosity normal
     - name: Publish
-      run: dotnet publish --configuration Release --output ./publish --self-contained true --runtime linux-x64 -p:PublishTrimmed=true
-    - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      run: dotnet publish --configuration Release --output ./publish --runtime linux-x64 --self-contained false
+    - name: FTP
+      uses: sebastianpopp/ftp-action@releases/v2
       with:
-        server: connieprice.co.uk
-        username: brimark-api
+        host: connieprice.co.uk
+        user: brimark-api
         password: ${{ secrets.ftp_password }}
-        protocol: ftps
-        local-dir: /home/runner/work/brimark-backend/brimark-backend/publish/
+        localDir: /home/runner/work/brimark-backend/brimark-backend/publish/
