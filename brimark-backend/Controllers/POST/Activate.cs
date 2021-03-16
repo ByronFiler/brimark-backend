@@ -22,7 +22,7 @@ namespace brimark_backend.Controllers
 
         private readonly ILogger<Activate> _logger;
 
-        private static readonly string responseBody = "{\"response\":\"{0}\"";
+        private static readonly string responseBody = "{{\"response\":\"{0}\"}}";
        
         public Activate(ILogger<Activate> logger)
         {
@@ -34,9 +34,7 @@ namespace brimark_backend.Controllers
         {
 
             // Still needs a valid IP, as it will be accessed by a clean page that will use this
-            if (
-                Utils.Validate.IsAlphanumerical(hash) && hash.Length == 32
-                )
+            if (Utils.Validate.IsAlphanumerical(hash) && hash.Length == 32)
             {
                 try
                 {
