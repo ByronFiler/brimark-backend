@@ -17,11 +17,5 @@ namespace brimark_backend
         public string Name { get; set; }
 
         public DateTime AccountCreated { get; set; }
-
-        public int ItemsSold { get; set; }
-
-        public sbyte SellerRating { get; set; }
-
-        public string CountryCode { get; set; }
     }
 }

@@ -44,6 +44,10 @@ namespace brimark_backend
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "brimark_backend", Version = "v1" });
             });
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,9 +67,7 @@ namespace brimark_backend
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "brimark_backend v1"));
             }
 
-            // Don't delete until a suitable alternative is found ok
-            Utils.Database.DBConnection.X();
-            Utils.Data.GetEmail();
+            Utils.Database.DBConnection.Connect();
 
             app.UseHttpsRedirection();
 
