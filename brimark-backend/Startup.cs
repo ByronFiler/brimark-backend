@@ -17,6 +17,9 @@ namespace brimark_backend
 {
     public class Startup
     {
+
+        private static readonly bool overrideDevelopment = true;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -59,13 +62,15 @@ namespace brimark_backend
             });
 
             app.UseAuthentication();
-
-            if (env.IsDevelopment())
+          
+            
+            if (env.IsDevelopment() || overrideDevelopment)
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "brimark_backend v1"));
             }
+            
 
             Utils.Database.DBConnection.Connect();
 
