@@ -25,9 +25,9 @@ jobs:
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish --runtime linux-x64 --self-contained false
     - name: FTP
-      uses: SamKirkland/FTP-Deploy-Action@3.0.0
+      uses: sebastianpopp/ftp-action@releases/v2
       with:
-        ftp-server: connieprice.co.uk
-        ftp-username: brimark-api
-        ftp-password: ${{ secrets.ftp_password }}
-        local-dir: /home/runner/work/brimark-backend/brimark-backend/publish/
+        host: connieprice.co.uk
+        user: brimark-api
+        password: ${{ secrets.ftp_password }}
+        localDir: /home/runner/work/brimark-backend/brimark-backend/publish/
