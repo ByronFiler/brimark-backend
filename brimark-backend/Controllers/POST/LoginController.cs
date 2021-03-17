@@ -36,7 +36,7 @@ namespace brimark_backend.Controllers
             MySqlDataReader loginReader;
             try
             {
-                if (Utils.Validate.IsValidEmail(usernameOrEmail))
+                if (Utils.Validate.IsValidEmail(usernameOrEmail) == Utils.Validate.EmailStates.VALID)
                 {
                     // Login with email
                     emailParameter.Value = usernameOrEmail;
@@ -87,6 +87,7 @@ namespace brimark_backend.Controllers
                         Email = loginReader.GetString("email"),
                         PaymentInformation = loginReader.GetString("payment_email"),
                         DarkTheme = loginReader.GetBoolean("dark_theme"),
+                        SessionID = Utils.Session.SessionManager.newKey(loginReader.GetString("name"))
 
                     };
 

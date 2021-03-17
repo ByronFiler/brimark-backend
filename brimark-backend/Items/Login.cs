@@ -14,6 +14,8 @@ namespace brimark_backend
 
         public bool DarkTheme { get; set; }
 
+        public string SessionID { get; set; }
+
     }
 }
 

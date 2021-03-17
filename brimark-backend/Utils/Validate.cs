@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace brimark_backend.Utils
 {
@@ -19,16 +20,22 @@ namespace brimark_backend.Utils
             return new Regex(@"^[a-zA-Z0-9]*$").IsMatch(text);
         }
 
-        public static bool IsValidEmail(String email)
+        public static EmailStates IsValidEmail(String email)
         {
             try
             {
                 var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
+
+                if (addr.Address == email)
+                {
+                    return new Regex(@"(\.edu(\.[a-z]+)?|\.ac\.[a-z]+)$").IsMatch(addr.Address) ? EmailStates.VALID : EmailStates.NOT_EDU_EMAIL;
+                }
+                else return EmailStates.INVALID_EMAIL;
+                
             }
-            catch
+            catch (FormatException)
             {
-                return false;
+                return EmailStates.INVALID_EMAIL;
             }
         }
 
@@ -44,5 +51,14 @@ namespace brimark_backend.Utils
             return new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,64}$").IsMatch(password);
         }
 
+        public enum EmailStates
+        {
+            VALID,
+            INVALID_EMAIL,
+            NOT_EDU_EMAIL
+        }
+
     }
+
+    
 }

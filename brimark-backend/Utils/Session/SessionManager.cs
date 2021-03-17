@@ -8,27 +8,28 @@ namespace brimark_backend.Utils.Session
     public class SessionManager
     {
 
-        private readonly Dictionary<string, Session> sessions = new Dictionary<string, Session>();
+        private static readonly Dictionary<string, Session> sessions = new Dictionary<string, Session>();
 
-        public void newKey(string accountName)
+        public static string newKey(string accountName)
         {
-
+            Session createdSession = new Session();
             sessions.Add(accountName, new Session());
+            return createdSession.key;
 
         }
 
-        public bool checkKey(string key)
+        public static bool checkKey(string key)
         {
             return sessions.ContainsKey(key) && sessions[key].reauthorizationDate >= DateTime.Now;
         }
 
-        public void reauthorize(string key)
+        public static void reauthorize(string key)
         {
             sessions[key].reauthorizationDate = DateTime.Now.AddHours(1);
         }
 
 
-        public void kill(string key)
+        public static void kill(string key)
         {
             sessions.Remove(key);
         }
