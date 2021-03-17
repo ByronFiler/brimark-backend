@@ -33,6 +33,17 @@ namespace brimark_backend.Controllers
         [HttpPost]
         public Login Get(String usernameOrEmail, String password)
         {
+
+            _logger.LogDebug("username or email is null? " + (usernameOrEmail == null));
+            _logger.LogDebug("password is null? " + (usernameOrEmail == null));
+
+            if (usernameOrEmail == null || password == null)
+            {
+                // 400 Invalid Parameters (Null Value(s))
+                this.HttpContext.Response.StatusCode = 400;
+                return null;
+            }
+
             MySqlDataReader loginReader;
             try
             {
