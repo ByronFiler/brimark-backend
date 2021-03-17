@@ -11,14 +11,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace brimark_backend
 {
     public class Startup
     {
-
         private static readonly bool overrideDevelopment = true;
 
         public Startup(IConfiguration configuration)

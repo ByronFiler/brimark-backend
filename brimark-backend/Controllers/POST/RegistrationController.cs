@@ -19,6 +19,31 @@ namespace brimark_backend.Controllers
     public class RegistrationController : ControllerBase
     {
 
+        // Create Account, MUST add to email and accounts tables
+
+        // Do it with a actual transaction
+        // todo https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqltransaction?view=dotnet-plat-ext-5.0
+
+        private static readonly MySqlCommand registerSql = new MySqlCommand(
+            @"
+BEGIN;
+INSERT INTO `accounts` (name, password, email, activation_hash, profile_picture) 
+    VALUES (@name, @password, @email, @activation_hash, @profile_picture);
+INSERT INTO `emails` (accountId)
+    VALUES (
+        (
+            SELECT id FROM `accounts`
+            WHERE id = (
+                SELECT MAX(id) 
+                FROM `accounts`
+            )
+        )
+    );
+COMMIT;
+"
+            );
+
+
         private static readonly MySqlCommand createAccountSql = new MySqlCommand(
             @"INSERT INTO `accounts` (name, password, email, activation_hash, profile_picture) VALUES (@name, @password, @email, @activation_hash, @profile_picture);"
             );
@@ -54,11 +79,6 @@ namespace brimark_backend.Controllers
             String password
             )
         {
-
-            _logger.LogInformation("username is null? " + (username == null));
-            _logger.LogInformation("email is null? " + (email == null));
-            _logger.LogInformation("password is null? " + (password == null));
-
             if (username == null || email == null || password == null)
             {
                 // 400: Bad Request (Invalid Parameters)
@@ -68,7 +88,7 @@ namespace brimark_backend.Controllers
             // Validate data on Client Side & Server Side as Client Side can be Manipulated
             if (
                     Utils.Validate.IsAlphanumerical(username) && username.Length <= 16
-                    && Utils.Validate.IsValidEmail(email) && email.Length <= 64
+                    && (Utils.Validate.IsValidEmail(email) == Utils.Validate.EmailStates.VALID) && email.Length <= 64
                     && Utils.Validate.IsValidPassword(password)
                 )
             {
@@ -113,6 +133,19 @@ namespace brimark_backend.Controllers
                         profilePictureParameter.Value = "PF" + DataGenerator.MakeId();
                         activationHashParameter.Value = DataGenerator.MakeHash();
 
+                        /*
+                        registerSql.Parameters.Clear();
+                        registerSql.Parameters.Add(nameParameter);
+                        registerSql.Parameters.Add(passwordParameter);
+                        registerSql.Parameters.Add(emailParameter);
+                        registerSql.Parameters.Add(profilePictureParameter);
+                        registerSql.Parameters.Add(activationHashParameter);
+
+                        registerSql.Prepare();
+                        registerSql.ExecuteNonQuery();
+                        */
+
+                        
                         createAccountSql.Parameters.Clear();
                         createAccountSql.Parameters.Add(nameParameter);
                         createAccountSql.Parameters.Add(passwordParameter);
@@ -125,6 +158,7 @@ namespace brimark_backend.Controllers
 
                         delete.Prepare();
                         delete.ExecuteNonQuery();
+                        
 
                         Utils.Mail.MailManager.Poke();
 
@@ -144,6 +178,9 @@ namespace brimark_backend.Controllers
                 
             } else
             {
+
+                _logger.LogInformation("" + Utils.Validate.IsValidEmail(email));
+
                 // 400: Bad Request (Invalid Form Data)
                 return StatusCode(400);
             }
@@ -156,6 +193,8 @@ namespace brimark_backend.Controllers
             delete.Connection = connection;
             checkExistingNames.Connection = connection;
             checkExistingEmail.Connection = connection;
+
+            registerSql.Connection = connection;
 
         }
 
