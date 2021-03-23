@@ -26,23 +26,41 @@ namespace brimark_backend.Utils.Session
             sessionsByAccountName.Add(createdSession.accountName, createdSession);
 
             return createdSession.key;
-
         }
 
         public static bool checkKey(string key)
         {
-            return sessionsByKey.ContainsKey(key) && sessionsByKey[key].reauthorizationDate >= DateTime.Now;
+            if (sessionsByKey.ContainsKey(key)) {
+                Session potentialSession = sessionsByKey[key];
+
+                if (potentialSession.isExpired()) {
+                    if (sessionsByKey[key].isReauthorizationExpired()) {
+                        kill(key);
+                    }
+                } else {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static void reauthorize(string key)
         {
-            sessionsByKey[key].reauthorizationDate = DateTime.Now.AddHours(1);
+            if (sessionsByKey.ContainsKey(key)) {
+                sessionsByKey[key].reauthorize();
+            }
         }
 
 
         public static void kill(string key)
         {
-            sessionsByKey.Remove(key);
+            if (sessionsByKey.ContainsKey(key)) {
+                Session sessionToKill = sessionsByKey[key];
+
+                sessionsByKey.Remove(sessionToKill.key);
+                sessionsByAccountName.Remove(sessionToKill.accountName);
+            }
         }
 
     }
