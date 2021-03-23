@@ -8,12 +8,11 @@ using System.Text;
 // Must USE SSL Connection due to sensitive password
 // TODO: Determine Valid IPs or however we want to do that
 // TODO: Validate and connect to database
-namespace brimark_backend.Controllers
-{
+namespace brimark_backend.Controllers {
+
     [ApiController]
     [Route("[controller]")]
-    public class LoginController : ControllerBase
-    {
+    public class LoginController : ControllerBase {
         private readonly ILogger<LoginController> _logger;
 
         private static readonly string responseBody = "{{\"error\":\"{0}\"}}";
@@ -25,30 +24,25 @@ namespace brimark_backend.Controllers
         private static readonly MySqlParameter emailParameter = new MySqlParameter("@email", MySqlDbType.VarChar, 64);
         private static readonly MySqlParameter passwordParameter = new MySqlParameter("@password", MySqlDbType.VarChar, 64);
 
-        public LoginController(ILogger<LoginController> logger)
-        {
+        public LoginController(ILogger<LoginController> logger) {
             _logger = logger;
         }
 
         [HttpPost]
-        public Login Get(String usernameOrEmail, String password)
-        {
+        public Login Get(String usernameOrEmail, String password) {
 
             _logger.LogDebug("username or email is null? " + (usernameOrEmail == null));
             _logger.LogDebug("password is null? " + (usernameOrEmail == null));
 
-            if (usernameOrEmail == null || password == null)
-            {
+            if (usernameOrEmail == null || password == null) {
                 // 400 Invalid Parameters (Null Value(s))
                 this.HttpContext.Response.StatusCode = 400;
                 return null;
             }
 
             MySqlDataReader loginReader;
-            try
-            {
-                if (Utils.Validate.IsValidEmail(usernameOrEmail) == Utils.Validate.EmailStates.VALID)
-                {
+            try {
+                if (Utils.Validate.IsValidEmail(usernameOrEmail) == Utils.Validate.EmailStates.VALID) {
                     // Login with email
                     emailParameter.Value = usernameOrEmail;
                     passwordParameter.Value = Utils.Encryption.hash(password);
@@ -58,38 +52,34 @@ namespace brimark_backend.Controllers
                     loginWithEmail.Parameters.Add(passwordParameter);
 
                     loginReader = loginWithEmail.ExecuteReader();
-                }
-                else
-                {
+                } else {
                     // Logging in with Username
                     nameParameter.Value = usernameOrEmail;
                     passwordParameter.Value = Utils.Encryption.hash(password);
 
+                    loginWithUsername.Parameters.Clear();
                     loginWithUsername.Parameters.Add(nameParameter);
                     loginWithUsername.Parameters.Add(passwordParameter);
 
                     loginReader = loginWithUsername.ExecuteReader();
                 }
 
-            } catch (MySqlException e)
-            {
+            } catch (MySqlException e) {
                 // 500: Internal Server Error (Database Error)
                 this.HttpContext.Response.StatusCode = 500;
                 return null;
             }
 
-            
-            if (loginReader.HasRows && loginReader.Read())
-            {
-                if (loginReader.GetBoolean("activated"))
-                {
+            Login returnValue = null;
+
+            if (loginReader.HasRows && loginReader.Read()) {
+                if (loginReader.GetBoolean("activated")) {
                     // User has activated their account
 
                     // Providing Userdata
                     this.HttpContext.Response.StatusCode = 200;
-                    
-                    return new Login()
-                    {
+
+                    returnValue = new Login() {
                         ProfilePicture = loginReader.GetString("profile_picture"),
                         Name = loginReader.GetString("name"),
                         AccountCreated = loginReader.GetDateTime("account_created"),
@@ -98,9 +88,7 @@ namespace brimark_backend.Controllers
                         DarkTheme = loginReader.GetBoolean("dark_theme"),
                         SessionID = Utils.Session.SessionManager.newKey(loginReader.GetString("name"))
                     };
-                }
-                else
-                {
+                } else {
                     // User has not activated their account do not allow them to login
 
                     // 403: Forbidden (Has not activated their account)
@@ -110,10 +98,8 @@ namespace brimark_backend.Controllers
                     byte[] hasNotActivatedBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "HAS_NOT_ACTIVATED"));
                     Response.ContentType = "application/json";
                     Response.Body.Write(hasNotActivatedBody, 0, hasNotActivatedBody.Length);
-                    return null;
                 }
-            } else
-            {
+            } else {
                 // Forbidden: 403 (Invalid Username and Password)
                 this.HttpContext.Response.StatusCode = 403;
 
@@ -121,12 +107,13 @@ namespace brimark_backend.Controllers
                 byte[] invalidCredentialsBody = Encoding.UTF8.GetBytes(String.Format(responseBody, "INVALID_CREDENTIALS"));
                 Response.ContentType = "application/json";
                 Response.Body.Write(invalidCredentialsBody, 0, invalidCredentialsBody.Length);
-                return null;
             }
+
+            loginReader.Close(); // If we're not using `using` we have to manually close the reader.
+            return returnValue;
         }
 
-        public static void SetConnection(MySqlConnection connection)
-        {
+        public static void SetConnection(MySqlConnection connection) {
             loginWithEmail.Connection = connection;
             loginWithUsername.Connection = connection;
         }

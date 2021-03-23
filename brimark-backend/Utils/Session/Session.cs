@@ -7,14 +7,16 @@ namespace brimark_backend.Utils.Session
 {
     public class Session
     {
+        public string accountName { set; get; }
+
         public string key { set; get; }
 
         public DateTime reauthorizationDate { set; get; }
 
         public DateTime expirationDate { set; get; }
 
-        public Session()
-        {
+        public Session(string accountName) {
+            this.accountName = accountName;
             this.key = DataGenerator.MakeId();
             this.reauthorizationDate = DateTime.Now.AddHours(1);
             this.expirationDate = DateTime.Now.AddMonths(1);
