@@ -52,7 +52,6 @@ namespace brimark_backend.Utils.Session
             }
         }
 
-
         public static void kill(string key)
         {
             if (sessionsByKey.ContainsKey(key)) {
