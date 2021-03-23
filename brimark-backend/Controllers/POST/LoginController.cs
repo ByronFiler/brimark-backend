@@ -87,42 +87,19 @@ namespace brimark_backend.Controllers
 
                     // Providing Userdata
                     this.HttpContext.Response.StatusCode = 200;
-
-                    try
-                    {
-                        return new Login()
-                        {
-
-                            ProfilePicture = loginReader.GetString("profile_picture"),
-                            Name = loginReader.GetString("name"),
-                            AccountCreated = loginReader.GetDateTime("account_created"),
-
-                            Email = loginReader.GetString("email"),
-                            PaymentInformation = loginReader.GetString("payment_email"),
-                            DarkTheme = loginReader.GetBoolean("dark_theme"),
-                            SessionID = Utils.Session.SessionManager.newKey(loginReader.GetString("name"))
-
-                        };
-                    } catch (MySqlException)
-                    {
-                        return new Login()
-                        {
-
-                            ProfilePicture = loginReader.GetString("profile_picture"),
-                            Name = loginReader.GetString("name"),
-                            AccountCreated = loginReader.GetDateTime("account_created"),
-
-                            Email = loginReader.GetString("email"),
-                            PaymentInformation = null,
-                            DarkTheme = loginReader.GetBoolean("dark_theme"),
-                            SessionID = Utils.Session.SessionManager.newKey(loginReader.GetString("name"))
-
-                        };
-                    }
-
                     
-
-                } else
+                    return new Login()
+                    {
+                        ProfilePicture = loginReader.GetString("profile_picture"),
+                        Name = loginReader.GetString("name"),
+                        AccountCreated = loginReader.GetDateTime("account_created"),
+                        Email = loginReader.GetString("email"),
+                        PaymentInformation = loginReader.IsDBNull(loginReader.GetOrdinal("payment_email")) ? "" : loginReader.GetString("payment_email"),
+                        DarkTheme = loginReader.GetBoolean("dark_theme"),
+                        SessionID = Utils.Session.SessionManager.newKey(loginReader.GetString("name"))
+                    };
+                }
+                else
                 {
                     // User has not activated their account do not allow them to login
 
