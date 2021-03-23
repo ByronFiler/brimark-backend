@@ -38,19 +38,19 @@ namespace brimark_backend.Utils.Mail
         {
 
             // If the daemon is dead, assume the database has been upstarted and restart the daemon
-            if (!worker.IsAlive)
-            {
-                worker = new MailWorker(client, connection);
-                worker.RunThread();
-            }
+            //if (!worker.IsAlive)
+            //{
+            //    worker = new MailWorker(client, connection);
+            //    worker.RunThread();
+            //}
 
         }
 
         public static void SetConnection(MySqlConnection connection)
         {
-            MailManager.connection = connection;
-            worker = new MailWorker(client, connection);
-            worker.RunThread();
+            //MailManager.connection = connection;
+            //worker = new MailWorker(client, connection);
+            //worker.RunThread();
         }
     }
 }
